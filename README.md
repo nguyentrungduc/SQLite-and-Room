@@ -334,3 +334,64 @@ search trừ khi minSDK < 16
 		)
 		
 ### Include AutoValue-based objects
+
+- Với Room 2.1, ta có thể sử dụng các lớp giá trị bất biến dựa trên Java bằng @AutoValue, làm các entity trong db của ứng dụng. Hỗ trợ này đặc biệt hữu ích khi phiên bản của 1 entity đc coi là bằng nhau nếu các cột của chúng chứa các giá trị giống hệt nhau
+
+		@AutoValue
+		@Entity
+		public abstract class User {
+		    // Supported annotations must include `@CopyAnnotations`.
+		    @CopyAnnotations
+		    @PrimaryKey
+		    public abstract long getId();
+
+		    public abstract String getFirstName();
+		    public abstract String getLastName();
+
+		    // Room uses this factory method to create User objects.
+		    public static User create(long id, String firstName, String lastName) {
+			return new AutoValue_User(id, firstName, lastName);
+		    }
+		}
+
+### Define relationships between objects
+
+- Vì SQLite là một cơ sở dữ liệu quan hệ, bạn có thể chỉ định mối quan hệ giữa các đối tượng. Mặc dù hầu hết các thư viện ánh xạ quan hệ đối tượng cho phép các đối tượng thực thể tham chiếu lẫn nhau, Room rõ ràng cấm điều này. Để tìm hiểu về lý do kỹ thuật đằng sau quyết định này, hãy xem Hiểu tại sao Room không cho phép tham chiếu đối tượng. 
+
+- Mặc dù bạn không thể sử dụng các mối quan hệ trực tiếp, Room vẫn cho phép bạn xác định các ràng buộc Khóa ngoài giữa các thực thể. 
+
+- Ví dụ: nếu có một thực thể khác gọi là Sách, bạn có thể xác định mối quan hệ của nó với thực thể Người dùng bằng cách sử dụng @ForeignKey
+		
+		@Entity(foreignKeys = arrayOf(ForeignKey(
+			    entity = User::class,
+			    parentColumns = arrayOf("id"),
+			    childColumns = arrayOf("user_id"))
+		       )
+		)
+		data class Book(
+		    @PrimaryKey var bookId: Int,
+		    var title: String?,
+		    @ColumnInfo(name = "user_id") var userId: Int
+		)
+
+### Nested objects
+- Trong một số trường hợp các bạn tạo ra object với các nested object, các bạn không có nhu cầu lưu chúng thành 1 bảng riêng mà đơn giản chỉ giống như 1 column bình thường các bạn có thể sử dụng anotaion @Embedded 		
+
+		data class Address(
+		    var street: String?,
+		    var state: String?,
+		    var city: String?,
+		    @ColumnInfo(name = "post_code") var postCode: Int
+		)
+
+		@Entity
+		data class User(
+		    @PrimaryKey var id: Int,
+		    var firstName: String?,
+		    @Embedded var address: Address?
+		)
+		
+### DAO
+- Để truy cập dữ liệu của ứng dụng của bạn bằng thư viện Room, bạn làm việc với các đối tượng truy cập dữ liệu hoặc DAO. Tập hợp các đối tượng Dao này tạo thành thành phần chính của Room, vì mỗi DAO bao gồm các phương thức cung cấp quyền truy cập trừu tượng vào cơ sở dữ liệu của ứng dụng của bạn.
+
+- Bằng cách truy cập cơ sở dữ liệu bằng lớp DAO thay vì trình tạo truy vấn hoặc truy vấn trực tiếp, bạn có thể tách các thành phần khác nhau của kiến trúc cơ sở dữ liệu của mình. 
