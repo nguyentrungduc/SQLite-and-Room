@@ -307,11 +307,30 @@ search trừ khi minSDK < 16
 		    @ColumnInfo(name = "lid") var languageId: Int
 		)
 		
+- Room cung cấp 1 số tùy chọn khác để xác định các thực thể được FTS hỗ trợ, bao gồm thứ tự kết quả, loại mã thông báo và các bảng được quản lý dưới dạng nội dung bên ngoài. 
 
+### Index specific columns
+-  Nếu ứng dụng phải hỗ trợ các phiên bản SDK không cho phép sử dụng các thực thể được hỗ trợ bởi bảng FTS3- hoặc FTS4, bạn vẫn có thể lập chỉ mục các cột nhất định trong cơ sở dữ liệu để tăng tốc truy vấn của mình. Để thêm các chỉ mục vào một thực thể, bao gồm thuộc tính chỉ mục trong chú thích 
+- Entity, liệt kê tên của các cột mà bạn muốn đưa vào chỉ mục hoặc chỉ mục tổng hợp.
 
-
-
-
-
+		@Entity(indices = arrayOf(Index(value = ["last_name", "address"])))
+		data class User(
+		    @PrimaryKey var id: Int,
+		    var firstName: String?,
+		    var address: String?,
+		    @ColumnInfo(name = "last_name") var lastName: String?,
+		    @Ignore var picture: Bitmap?
+		)
       
+-  Đôi khi, các trường hoặc nhóm trường nhất định trong cơ sở dữ liệu phải là duy nhất. Bạn có thể thực thi thuộc tính duy nhất này bằng cách đặt unique = true
 
+		@Entity(indices = arrayOf(Index(value = ["first_name", "last_name"],
+                unique = true)))
+		data class User(
+		    @PrimaryKey var id: Int,
+		    @ColumnInfo(name = "first_name") var firstName: String?,
+		    @ColumnInfo(name = "last_name") var lastName: String?,
+		    @Ignore var picture: Bitmap?
+		)
+		
+### Include AutoValue-based objects
