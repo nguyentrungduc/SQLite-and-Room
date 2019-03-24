@@ -219,9 +219,27 @@ Realm lưu trữ dữ liệu trong các bảng viết bằng core C++. Việc n�
 
 - Ứng dụng sử dụng cơ sở dữ liệu Room để lấy các đối tượng truy cập dữ liệu hoặc DAO, được liên kết với cơ sở dữ liệu đó. Sau đó, ứng dụng sử dụng mỗi DAO để nhận các thực thể từ cơ sở dữ liệu và lưu mọi thay đổi đối với các thực thể đó trở lại cơ sở dữ liệu. Cuối cùng, ứng dụng sử dụng một thực thể để lấy và đặt các giá trị tương ứng với các cột trong cơ sở dữ liệu.
 
+### Define data
+- Khi sử dụng Room, bạn xác định các trường liên quan là entities. Với mỗi entity, một bảng đc tạo trong đối tượng database được liên kết với các item. Ta phải tham chiếu lớp entity qua mảng thực tế trong Database class
 
+- User 
+		
+		@Entity
+		data class User(
+		    @PrimaryKey var id: Int,
+		    var firstName: String?,
+		    var lastName: String?
+		)
+		
+- Để persitst 1 trường, Room phải có quyền truy cập vào nó. Ta có thể đặt trường công khai hoặc ta có thể cung cấp 1 getter và setter cho nó. 
 
+-  Lưu ý: Các entity có thể có một hàm tạo trống (nếu lớp DAO tương ứng có thể truy cập từng trường tồn tại) hoặc một hàm tạo có tham số chứa các kiểu và tên khớp với các trường trong thực thể. Room cũng có thể sử dụng các hàm tạo đầy đủ hoặc một phần, chẳng hạn như hàm tạo chỉ nhận được một số trường.
 
+### @PrimaryKey
+
+- Mỗi entity phải xác định ít nhất 1 trường là khóa chính. Ngay cả khi chỉ có 1 trường, bạn vẫn cần chú thích trường với 
+#PrimaryKey. Ngoài ra, nếu bạn muốn Room gán ID tự động cho các thực thể, bạn có thể đặt thuộc tính autoGenerate của 
+PrimaryKey. 
 
 
 
