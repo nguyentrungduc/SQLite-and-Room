@@ -1,5 +1,23 @@
 # SQLite-and-Room
 
+## DB in Android
+- Khi phát triển ứng dụng Android, ta sẽ gặp những case phải lưu trữ dữ liệu ở đâu đó, Một db bạn tạo bạn tạo có thể rất tuyệt vời hoặc nó cũng làm việc phát triển tiếp theo của ứng dụng khó khăn hơn bh hết. Trong Android có 2 loại db phổ biến là Realm với SQLite
+
+## Realm 
+- Realm là một cơ sở dữ liệu nhẹ, có thể thay thế cả hai thư viện SQL và ORM trong các ứng dụng Android. Realm không sử dụng SQLite làm engine của nó. Thay vào đó, nó dùng core C++ nhằm mục đích cung cấp một thư viện cơ sở dữ liệu thay thế SQLite.
+Realm lưu trữ dữ liệu trong các bảng viết bằng core C++. Việc này cho phép Realm được truy cập dữ liệu từ nhiều ngôn ngữ cũng như một loạt các truy vấn khác nhau.
+- Dưới đây là những ưu điểm của Realm so với SQLite:
+- Nhanh hơn so với SQLite (gấp 10 lần so với SQLite cho các hoạt động bình thường).
+- Dễ sử dụng.
+- Chuyển đổi đối tượng xử lý cho bạn.
+- Thuận tiện cho việc tạo ra và lưu trữ dữ liệu nhanh chóng.
+- Ngoài ra còn có một số nhược điểm sau :
+- Vẫn còn đang phát triển.
+- Không có nhiều kênh trao đổi trực tuyến.
+- Không thể truy cập các đối tượng thông qua thread.
+
+- Realm hỗ trợ đa nền tảng (hiện tại là Android, iOS, OSX), file CSDL có thể chia sẻ dễ dàng giữa các nền tảng trên. Realmluôn giữ tư tưởng nâng cao hiệu năng và giữ vững độ ổn định. Kết quả benchmark (có source code) cho thấy Realm nhanh hơn khoảng 2-10 lần trong các tác vụ đọc, ghi so với SQLitethuần và một số thư viện ORM phổ biến hiện nay.
+
 ## SQL 
 - Lưu trữ dữ liệu vào database là ý tưởng dành cho các dữ liệu kiểu lặp lại hoặc có cấu trúc , ví dụ như thông tin danh bạ.
 - APIs mà chúng ta sẽ dùng để sử dụng database trên Android có trong package sau : 
