@@ -6,17 +6,43 @@
 ## Realm 
 - Realm là một cơ sở dữ liệu nhẹ, có thể thay thế cả hai thư viện SQL và ORM trong các ứng dụng Android. Realm không sử dụng SQLite làm engine của nó. Thay vào đó, nó dùng core C++ nhằm mục đích cung cấp một thư viện cơ sở dữ liệu thay thế SQLite.
 Realm lưu trữ dữ liệu trong các bảng viết bằng core C++. Việc này cho phép Realm được truy cập dữ liệu từ nhiều ngôn ngữ cũng như một loạt các truy vấn khác nhau.
-- Dưới đây là những ưu điểm của Realm so với SQLite:
+### Những ưu điểm của Realm so với SQLite:
 - Nhanh hơn so với SQLite (gấp 10 lần so với SQLite cho các hoạt động bình thường).
 - Dễ sử dụng.
 - Chuyển đổi đối tượng xử lý cho bạn.
 - Thuận tiện cho việc tạo ra và lưu trữ dữ liệu nhanh chóng.
-- Ngoài ra còn có một số nhược điểm sau :
+### Ngoài ra còn có một số nhược điểm sau :
 - Vẫn còn đang phát triển.
 - Không có nhiều kênh trao đổi trực tuyến.
 - Không thể truy cập các đối tượng thông qua thread.
 
 - Realm hỗ trợ đa nền tảng (hiện tại là Android, iOS, OSX), file CSDL có thể chia sẻ dễ dàng giữa các nền tảng trên. Realmluôn giữ tư tưởng nâng cao hiệu năng và giữ vững độ ổn định. Kết quả benchmark (có source code) cho thấy Realm nhanh hơn khoảng 2-10 lần trong các tác vụ đọc, ghi so với SQLitethuần và một số thư viện ORM phổ biến hiện nay.
+
+### Cách thức lưu dữ liệu của Realm
+- Realm tổ chức lưu dữ liệu dưới dạng cây B-Tree
+- Lý do chính cho sự tồn tại của B-Trees là sử dụng tốt hơn hành vi của các thiết bị đọc và ghi các khối dữ liệu lớn. Hai thuộc tính quan trọng để làm cho cây B tốt hơn cây nhị phân khi dữ liệu phải được lưu trữ trên đĩa:
+
+- Truy cập vào đĩa thực sự chậm (so với bộ nhớ hoặc cache, truy cập ngẫu nhiên vào dữ liệu trên đĩa là các đơn đặt hàng có cường độ chậm hơn)
+- Mỗi lần đọc đơn lẻ làm cho toàn bộ khu vực được nạp từ ổ đĩa - giả sử kích thước sector là 4K, điều này có nghĩa là 1000 số nguyên hoặc hàng chục đối tượng lớn hơn bạn đang lưu trữ.
+- Do đó, chúng ta có thể sử dụng những ưu điểm của thực tế thứ hai, đồng thời cũng giảm thiểu số lượng truy cập đĩa khuyết điểm.
+
+- Vì vậy, thay vì chỉ lưu trữ một số trong mỗi nút cho chúng ta biết nếu chúng ta nên tiếp tục sang trái hoặc sang phải, chúng ta có thể tạo chỉ mục lớn hơn cho chúng ta biết liệu chúng ta có nên tiếp tục 1/100 đầu tiên hay không hoặc đến ngày thứ 99 (hãy tưởng tượng sách trong thư viện được sắp xếp theo chữ cái đầu tiên của chúng, sau đó là chữ cái thứ hai, v.v.). 
+
+- Điều này dẫn đến gần như logb N tra cứu, trong đó N là số lượng bản ghi. Con số này, trong khi tiệm cận giống như log2 N, thực sự nhỏ hơn vài lần với N và b đủ lớn và vì chúng ta đang nói về lưu trữ dữ liệu vào đĩa để sử dụng trong cơ sở dữ liệu, v.v ..., lượng dữ liệu thường lớn đủ để biện minh cho điều này.
+
+- Phần còn lại của quyết định thiết kế chủ yếu được thực hiện để làm cho một trong những hoạt động hiệu quả, như sửa đổi một cây N-ary là phức tạp hơn một nhị phân.
+
+- Cây B-tree là cây tìm kiếm nhị phân. Cây B có thể có nhiều hơn hai nút con. Trong thực tế, số lượng các nút con là biến.
+
+- Vì vậy, bạn có thể thay đổi số lượng các nút con sao cho kích thước của một nút luôn là bội số của kích thước khối hệ thống tệp. Điều này làm giảm lãng phí khi đọc: bạn không thể đọc ít hơn một khối anyway, bạn luôn phải đọc toàn bộ khối, vì vậy bạn cũng có thể điền vào nó với dữ liệu hữu ích. Việc tăng số lượng các nút con cũng sẽ làm giảm độ sâu của cây, do đó giảm số lượng trung bình của "hoa bia" (tức là đĩa đọc), một lần nữa tăng hiệu suất.
+
+- Lưu ý: B Tree thường được sử dụng để lưu trữ các cấu trúc dữ liệu có độ lớn lớn hơn bộ nhớ, trong khi các cây nhị phân thường được sử dụng để lưu trữ các cấu trúc dữ liệu có đơn đặt hàng có độ lớn nhỏ hơn bộ nhớ. Trong thực tế, B- tree được thiết kế đặc biệt như một cấu trúc dữ liệu trên đĩa như trái ngược với cấu trúc dữ liệu trong bộ nhớ.
+
+### Realm hay SQLite
+- Tùy vào bài toán tùy nhu cầu, tùy khách hàng
+- Realm sử dụng cú pháp lưu đơn gian, query nhanh với những dữ liệu lớn, nhưng các query phức tạp có vẻ khó khăn, nếu có nhiều quan hệ sql có vẻ tốt hơn
+- Realm phải import thư viện nó sẽ làm app tăng lên vài MB còn SQLite thì ko 
+- Sqlite code khá dài và phức tạp, nhưng khi Room ra mắt thì khá ngon
 
 ## SQL 
 - Lưu trữ dữ liệu vào database là ý tưởng dành cho các dữ liệu kiểu lặp lại hoặc có cấu trúc , ví dụ như thông tin danh bạ.
