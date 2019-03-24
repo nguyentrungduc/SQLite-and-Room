@@ -198,6 +198,32 @@ Realm lưu trữ dữ liệu trong các bảng viết bằng core C++. Việc n�
 		    values,
 		    selection,
 		    selectionArgs);
+		    
+## Room
+- Room  là một Persistence Library cung cấp một lớp trừu tượng trên SQLite để cho phép truy cập cơ sở dữ liệu dễ dàng trong khi khai thác toàn bộ sức mạnh của SQLite.
+
+### Đặc điểm:
+- Framework chính (Sqlite Database) cung cấp các built-in support cho các trường hợp làm việc với các nội dung SQL thô. Mặc dù các API này khá mạnh mẽ nhưng chúng lại tương đối low-level và yêu cầu khá nhiều thời gian và nỗ lực để sử dụng:
+
+- Không có xác thực các câu truy vấn SQL ở thời điểm compile-time. Khi data graph thay đổi thì dev sẽ phải cập nhật lại các câu truy vấn SQL thủ công. Việc này khá mất thời gian và xác suất gặp lỗi trong quá trình khá lớn.
+
+- Sẽ phải dùng nhiều code khung để chuyển đổi giữa truy vấn SQL với các Java data object (Phần này chắc ai làm việc với DB nhiều chắc chắn hiểu rõ)
+
+- Có 3 thành phần chính trong Room
+
+- Database: Chứa database holder đóng vai trò là điểm truy cập chính cho kết nối cơ bản với dữ liệu quan hệ. Annotation sẽ cung cấp danh sách các thực thể và nội dung class sẽ định nghĩa danh sách các DAO (đối tượng truy cập CSDL) của CSDL. Nó cũng là điểm truy cập chính cho các kết nối phía dưới. Annotated class nên để là lớp abstract extends RoomDatabase. Tại thời điểm runtime thì dev có thể nhận được một instance của nó bằng cách gọi Room.databaseBuilder() hoặc Room.inMemoryDatabaseBuilder(). 
+
+- Entity: Đại diện cho 1 bảng cơ sở dữ liệu
+
+- DAO: Chứa các phương thức được sử dụng để truy cập cơ sở dữ liệu.
+
+- Ứng dụng sử dụng cơ sở dữ liệu Room để lấy các đối tượng truy cập dữ liệu hoặc DAO, được liên kết với cơ sở dữ liệu đó. Sau đó, ứng dụng sử dụng mỗi DAO để nhận các thực thể từ cơ sở dữ liệu và lưu mọi thay đổi đối với các thực thể đó trở lại cơ sở dữ liệu. Cuối cùng, ứng dụng sử dụng một thực thể để lấy và đặt các giá trị tương ứng với các cột trong cơ sở dữ liệu.
+
+
+
+
+
+
 
 
       
