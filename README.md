@@ -241,10 +241,53 @@ Realm lưu trữ dữ liệu trong các bảng viết bằng core C++. Việc n�
 #PrimaryKey. Ngoài ra, nếu bạn muốn Room gán ID tự động cho các thực thể, bạn có thể đặt thuộc tính autoGenerate của 
 PrimaryKey. 
 
+		@Entity(primaryKeys = arrayOf("firstName", "lastName"))
+		data class User(
+		    var firstName: String?,
+		    var lastName: String?
+		)
+
+- Mặc định, room sử dụng tên lớp làm tên bảng cơ sở dữ liệu, nếu muốn bảng có 1 tên khác, hãy đặt thuộc tính tên bảng với anitotion @Entity:		
+		
+		@Entity(tableName = "users")
+		data class User (
+		    @PrimaryKey var id: Int,
+		    @ColumnInfo(name = "first_name") var firstName: String?,
+		    @ColumnInfo(name = "last_name") var lastName: String?
+		)
+		
+### Ignore fields
+
+- Mặc định, Room tạo 1 cột cho từng trường được xác định trong entity. Nếu 1 thực thể có các trường mà ko muốn tồn tại có thể sử dụng 
+@Ignore 
+		
+		@Entity
+		data class User(
+		    @PrimaryKey var id: Int,
+		    var firstName: String?,
+		    var lastName: String?,
+		    @Ignore var picture: Bitmap?
+		)
+		
+- Trong trường hợp một thực thể kế thừa các trường từ một thực thể khác, việc sử dụng thuộc tính bị bỏ qua của thuộc tính @Entity thường dễ dàng hơn:
+
+		open class User {
+		    var picture: Bitmap? = null
+		}
+
+		@Entity(ignoredColumns = arrayOf("picture"))
+		data class RemoteUser(
+		    @PrimaryKey var id: Int,
+		    var hasVpn: Boolean
+		) : User()
+		
+### Provide table search support
 
 
 
-      
+
+
+
 
       
 
