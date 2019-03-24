@@ -282,7 +282,31 @@ PrimaryKey.
 		) : User()
 		
 ### Provide table search support
+- Room support 1 số loại annotations giúp ta dễ dàng tìm kiếm chi tiết hơn trong các bảng của cơ sở dữ liệu, sử dụng full- text 
+search trừ khi minSDK < 16
+### Support full-text search
+- Nếu app của bạn yêu cầu truy cập rất nhanh vào thông tin db thông qua tìm kiếm văn bản (FTS), hãy để các entity đc hôc trợ bởi 1 bảng ảo dử dụng extention module FTS3 hay FTS4 SQLite. Để sử dụng cái này room 2.1 trở lên và thêm anotation @Fts3 hay @Fts4 vào entity
 
+		// Use `@Fts3` only if your app has strict disk space requirements or if you
+		// require compatibility with an older SQLite version.
+		@Fts4
+		@Entity(tableName = "users")
+		data class User(
+		    /* Specifying a primary key for an FTS-table-backed entity is optional, but
+		       if you include one, it must use this type and column name. */
+		    @PrimaryKey @ColumnInfo(name = "rowid") var id: Int,
+		    @ColumnInfo(name = "first_name") var firstName: String?
+		)
+		
+- Trong trường hợp bảng hỗ trợ nội dung bằng nhiều ngôn ngữ, hãy sử dụng tùy chọn ngôn ngữId để chỉ định cột lưu trữ thông tin ngôn ngữ cho mỗi hàng:
+
+		@Fts4(languageId = "lid")
+		@Entity(tableName = "users")
+		data class User(
+		    // ...
+		    @ColumnInfo(name = "lid") var languageId: Int
+		)
+		
 
 
 
