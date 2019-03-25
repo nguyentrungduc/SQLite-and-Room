@@ -395,3 +395,43 @@ search trừ khi minSDK < 16
 - Để truy cập dữ liệu của ứng dụng của bạn bằng thư viện Room, bạn làm việc với các đối tượng truy cập dữ liệu hoặc DAO. Tập hợp các đối tượng Dao này tạo thành thành phần chính của Room, vì mỗi DAO bao gồm các phương thức cung cấp quyền truy cập trừu tượng vào cơ sở dữ liệu của ứng dụng của bạn.
 
 - Bằng cách truy cập cơ sở dữ liệu bằng lớp DAO thay vì trình tạo truy vấn hoặc truy vấn trực tiếp, bạn có thể tách các thành phần khác nhau của kiến trúc cơ sở dữ liệu của mình. 
+
+## Define methods for convenience
+### Insert
+- Khi tạo một DAO method với annotate @Insert, room sẽ tạo ra 1 implemention chèn tất cả các tham số vào db trong 1 transaction ddơn
+
+		@Dao
+		interface MyDao {
+		    @Insert(onConflict = OnConflictStrategy.REPLACE)
+		    fun insertUsers(vararg users: User)
+
+		    @Insert
+		    fun insertBothUsers(user1: User, user2: User)
+
+		    @Insert
+		    fun insertUsersAndFriends(user: User, friends: List<User>)
+		}
+
+- Nếu phương thức @Insert chỉ nhận được 1 tham số, nó có thể trả về long, đó là rowId mới cho item ddc chèn. Nếu tham số là một mảng hoặc một tập hợp, nó sẽ trả về long[] hoặc List<Long> 
+
+### Update
+- Phương thức update  sẽ sửa đổi một tập hợp các entity, được đưa ra dưới dạng tham số, trong cơ sở dữ liệu. Nó sử dụng một truy vấn khớp với khóa chính của mỗi entity
+
+		@Dao
+		interface MyDao {
+		    @Update
+		    fun updateUsers(vararg users: User)
+		}
+		
+### Delete
+
+		@Dao
+		interface MyDao {
+		    @Delete
+		    fun deleteUsers(vararg users: User)
+		}
+		
+### Query
+
+		
+
