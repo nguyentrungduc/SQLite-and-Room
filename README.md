@@ -432,6 +432,53 @@ search trừ khi minSDK < 16
 		}
 		
 ### Query
+- Query là annotation chính được sử dụng trong các lớp DAO. Nó cho phép bạn thực hiện các thao tác đọc / ghi trên cơ sở dữ liệu. 
 
+- Query được xác minh tại complite time, vì vậy nếu có vấn đề với truy vấn, sẽ xảy ra lỗi tại complite time thay vì lỗi tại run time. 
+
+- Room cũng verify giá trị trả về của truy vấn sao cho nếu tên của trường trong đối tượng được trả về không khớp với tên cột tương ứng trong phản hồi truy vấn, Room sẽ thông báo cho bạn theo một trong hai cách sau: 
+
+- Nó đưa ra cảnh báo nếu chỉ một số tên trường khớp. 
+- Nó báo lỗi nếu không có tên trường khớp.
+
+		@Dao
+		interface MyDao {
+		    @Query("SELECT * FROM user")
+		    fun loadAllUsers(): Array<User>
+		}
 		
+- Tại complite time, Room đẻ biết nó đang truy vấn đến tất cả các cột trong bảng user, nếu có lỗi cú pháp hay ko tồn tại bảng user nó sẽ báo lỗi ngay tại complite time
 
+- Ta cũng dễ dàng có thể thêm các param vào query
+
+		@Dao
+		interface MyDao {
+		    @Query("SELECT * FROM user WHERE age BETWEEN :minAge AND :maxAge")
+		    fun loadAllUsersBetweenAges(minAge: Int, maxAge: Int): Array<User>
+
+		    @Query("SELECT * FROM user WHERE first_name LIKE :search " +
+			   "OR last_name LIKE :search")
+		    fun findUserWithName(search: String): List<User>
+		}
+
+- Một số truy vấn của bạn có thể yêu cầu bạn truyền vào một số lượng tham số khác nhau, với số lượng tham số chính xác không được biết cho đến khi chạy. 
+
+		@Dao
+		interface MyDao {
+		    @Query("SELECT first_name, last_name FROM user WHERE region IN (:regions)")
+		    fun loadUsersFromRegions(regions: List<String>): List<NameTuple>
+		}
+
+### Querying multiple tables
+		@Dao
+		interface MyDao {
+		    @Query(
+			"SELECT * FROM book " +
+			"INNER JOIN loan ON loan.book_id = book.id " +
+			"INNER JOIN user ON user.id = loan.user_id " +
+			"WHERE user.name LIKE :userName"
+		    )
+		    fun findBooksBorrowedByNameSync(userName: String): List<Book>
+		}
+
+### Migrate DB
