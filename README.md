@@ -481,4 +481,23 @@ search trừ khi minSDK < 16
 		    fun findBooksBorrowedByNameSync(userName: String): List<Book>
 		}
 
-### Migrate DB
+## Migrate DB
+* Room Db cho phép ta viết migration class để đảm bảo việc toàn vẹn dữ liệu. Mỗi class Migration có startVersion và endVersion. Khi chạy, Room sẽ chạy method migrate()
+
+			val MIGRATION_1_2 = object : Migration(1, 2) {
+		    override fun migrate(database: SupportSQLiteDatabase) {
+			database.execSQL("CREATE TABLE `Fruit` (`id` INTEGER, `name` TEXT, " +
+				"PRIMARY KEY(`id`))")
+		    }
+		}
+
+		val MIGRATION_2_3 = object : Migration(2, 3) {
+		    override fun migrate(database: SupportSQLiteDatabase) {
+			database.execSQL("ALTER TABLE Book ADD COLUMN pub_year INTEGER")
+		    }
+		}
+
+		Room.databaseBuilder(applicationContext, MyDb::class.java, "database-name")
+			.addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()	
+			
+
