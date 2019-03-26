@@ -499,5 +499,21 @@ search trừ khi minSDK < 16
 
 		Room.databaseBuilder(applicationContext, MyDb::class.java, "database-name")
 			.addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()	
+
+## TypeCoverter
+- Với room nếu bạn muốn lưu 1 số kiểu như date time, room sẽ ko hỗ trợ, thay vào đó nó sẽ cũng cấp 1 annotation để map nó vào kiểu object để room có thể hiểu đc và ng lại 
+
+			public class Converters {
+			    @TypeConverter
+			    public static Date fromTimestamp(Long value) {
+				return value == null ? null : new Date(value);
+			    }
+
+			    @TypeConverter
+			    public static Long dateToTimestamp(Date date) {
+				return date == null ? null : date.getTime();
+			    }
+			}
 			
+
 
